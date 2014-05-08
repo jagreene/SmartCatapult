@@ -8,13 +8,26 @@ import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 from random import random
 # ser = serial.Serial('/dev/tty.usbserial', 9600)
+ 
+def calcCatapultInteractions(mP, kS, rT, thetaT, stopAngle):
+    thetaA = np.pi
+    rA = .3302
+    hA = .0127
+    wA = .0191
+    mA = .056
+    rP = .027
+    dA = .16764
+    eqLS = .182
 
 
-def calcCatapultInteractions(thetaA, rA, hA, wA, mA, kS, attachPointS, dA, eqLS, stopAngle):
-    iA = mA * (wA ** 2 + hA ** 2) / 3
+    iA = mA * (wA ** 2 + rA ** 2) / 3
+    iP = mP * (rP**2) + mP*rA**2
+    iA += iP
+    xOffset = 0.0762
+    yOffset = 0.0762
 
-    xPosS = attachPointS[0]
-    yPosS = attachPointS[1]
+    xPosS = rT*np.cos(thetaT)+xOffset
+    yPosS = rT*np.cos(thetaT)+yOffset
 
     omegaA = 0
     y0 = [thetaA, omegaA]
@@ -160,10 +173,8 @@ if __name__ == '__main__':
     data = np.zeros([1, 2])
 
     for angle in np.arange(np.pi, np.pi / 2, -.05):
-        [thetaF, omegaF] = calcCatapultInteractions(
-            np.pi, .3302, .0127, .0191, .056, .197, (
-                0.143764, 0.102616), 0.16764, .1778,
-            angle)
+        #mP, kS, rT, thetaT, stopAngle
+        [thetaF, omegaF] = calcCatapultInteractions(.02, 135/2, 0.127, .1, angle)
 
         r = .35
         vf = abs(omegaF * r)
