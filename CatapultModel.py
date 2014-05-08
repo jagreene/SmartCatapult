@@ -1,27 +1,24 @@
-"""Laptop based physics model for our 
+"""Laptop based physics model for our
 smart catapult, has a gui for user input
 of desired distance and outputs
 positions for the servos and stepper moters"""
 
-import serial
 import numpy as np
 import matplotlib.pyplot as plt
-import pylab
 from scipy.integrate import odeint
-import time
-
+from random import random
 # ser = serial.Serial('/dev/tty.usbserial', 9600)
 
 
 def calcCatapultInteractions(thetaA, rA, hA, wA, mA, kS, attachPointS, dA, eqLS, stopAngle):
-    iA = mA * (wA ** 2 + hA ** 2) / 12
+    iA = mA * (wA ** 2 + hA ** 2) / 3
 
     xPosS = attachPointS[0]
     yPosS = attachPointS[1]
 
     omegaA = 0
     y0 = [thetaA, omegaA]
-    t = np.linspace(0, .2, 10000)
+    t = np.linspace(0, 5, 10000)
 
     def calcAlpha(y, t):
         thetaI = y[0]
@@ -52,26 +49,28 @@ def calcCatapultInteractions(thetaA, rA, hA, wA, mA, kS, attachPointS, dA, eqLS,
     omegaF = omegaF[:len(thetaF)]
     t = t[:len(thetaF)]
 
-    print "Final Angle = " + str(thetaF)
-    print "Final Omega = " + str(omegaF)
-
-    # plt.plot(rA*np.cos(thetaF), rA*np.sin(thetaF), linewidth=2.0)
-    # pylab.show()
-    plt.plot(t, omegaF)
-    plt.title("Angular Velocity over Time")
-    plt.xlabel("time")
-    plt.ylabel("Angular Velocity (rads/s)")
-    plt.figure()
-    plt.title("Catapult Tip Trajectory")
-    plt.xlabel("Y Position")
-    plt.ylabel("X Position")
-    plt.plot(rA * np.cos(thetaF), rA * np.sin(thetaF))
-    plt.figure()
-    plt.title("Catapult Angle over Time")
-    plt.xlabel("Time")
-    plt.ylabel("Angle")
-    plt.plot(t, thetaF)
-    plt.show()
+    # plt.plot(t, omegaF)
+    # plt.title("Angular Velocity over Time", fontsize=20)
+    # plt.xlabel("Time (s)", fontsize=18)
+    # plt.ylabel("Angular Velocity (rads/s)", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.figure()
+    # plt.title("Catapult Tip Trajectory", fontsize=20)
+    # plt.axis((-.4, 0, 0, .4))
+    # plt.xlabel("X Position (m)", fontsize=18)
+    # plt.ylabel("Y Position (m)", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.plot(rA * np.cos(thetaF), rA * np.sin(thetaF))
+    # plt.figure()
+    # plt.title("Catapult Angle over Time", fontsize=20)
+    # plt.xlabel("Time (s)", fontsize=18)
+    # plt.ylabel("Angle (Rad)", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.plot(t, thetaF)
+    # plt.show()
 
     return [thetaF[-1], omegaF[-1]]
 
@@ -84,7 +83,7 @@ def calcProjectileMotion(posI, vI):
     vy0 = vI[1]
 
     yI = [x0, y0, vx0, vy0]
-    t = np.linspace(0, 5, 5000)
+    t = np.linspace(0, 10, 50000)
 
     def calcForces(y, t):
 
@@ -117,47 +116,105 @@ def calcProjectileMotion(posI, vI):
 
     t = t[:len(yf)]
 
-    print yf
+    # plt.figure()
+    # plt.plot(t, xf)
+    # plt.title("X Distance over Time", fontsize=20)
+    # plt.xlabel("Time (s)", fontsize=18)
+    # plt.ylabel("X Distance (m)", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.figure()
+    # plt.plot(t, yf)
+    # plt.title("Y Distance over Time", fontsize=20)
+    # plt.xlabel("Time (s)", fontsize=18)
+    # plt.ylabel("Y Distance (m)", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.figure()
+    # plt.plot(xf, yf)
+    # plt.title("Projectile Trajectory", fontsize=20)
+    # plt.xlabel("X Distance (m)", fontsize=18)
+    # plt.ylabel("Y Distance (m)", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.figure()
+    # plt.plot(t, vxf)
+    # plt.title("Vx over Time", fontsize=20)
+    # plt.xlabel("Time", fontsize=18)
+    # plt.ylabel("Vx Distance", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.figure()
+    # plt.plot(t, vyf)
+    # plt.title("Vy over Time", fontsize=20)
+    # plt.xlabel("Time", fontsize=18)
+    # plt.ylabel("Vy Distance", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+    # plt.show()
 
-    plt.figure()
-    plt.plot(t, xf)
-    plt.title("X Distance over Time")
-    plt.xlabel("time")
-    plt.ylabel("X Distance")
-    plt.figure()
-    plt.plot(t, yf)
-    plt.title("Y Distance over Time")
-    plt.xlabel("Time")
-    plt.ylabel("Y Distance")
-    plt.figure()
-    plt.plot(xf, yf)
-    plt.title("Trajectory")
-    plt.xlabel("X Distance")
-    plt.ylabel("Y Distance")
-    plt.figure()
-    plt.plot(t, vxf)
-    plt.title("Vx over Time")
-    plt.xlabel("Time")
-    plt.ylabel("Vx Distance")
-    plt.figure()
-    plt.plot(t, vyf)
-    plt.title("Vy over Time")
-    plt.xlabel("Time")
-    plt.ylabel("Vy Distance")
+    return [xf, yf]
+
+if __name__ == '__main__':
+    print "Start"
+    data = np.zeros([1, 2])
+
+    for angle in np.arange(np.pi, np.pi / 2, -.05):
+        [thetaF, omegaF] = calcCatapultInteractions(
+            np.pi, .3302, .0127, .0191, .056, .197, (
+                0.143764, 0.102616), 0.16764, .1778,
+            angle)
+
+        r = .35
+        vf = abs(omegaF * r)
+
+        posI = [r * np.cos(thetaF), r * np.sin(thetaF)]
+        vI = [vf * np.sin(thetaF), -vf * np.cos(thetaF)]
+
+        trajectory = calcProjectileMotion(posI, vI)
+
+        plt.plot(trajectory[0], trajectory[1], color=(
+            (angle - np.pi / 2) / (np.pi / 2), (angle - np.pi / 2) / (np.pi / 2), (angle - np.pi / 2) / (np.pi / 2)), alpha = .8, label="Theta = " + str(angle))
+
+    plt.title("The Effect of Stopping Arm Angle on Trajectory", fontsize=20)
+    plt.xlabel("X Distance (m)", fontsize=18)
+    plt.ylabel("Y Distance (m)", fontsize=18)
+    plt.yticks(fontsize=14)
+    plt.xticks(fontsize=14)
     plt.show()
 
+    # rt = 0.039116
+    # height = 0.102616
+    # xDist = 0.143764
+    # data = np.zeros([1, 2])
 
-[thetaF, omegaF] = calcCatapultInteractions(
-    np.pi, .35, .01, .05, .25, .25, (.2, .25), .2, 0, 3 * np.pi / 4)
+    # for angle in np.arange(0, np.pi / 2, 0.01):
+    #     [thetaF, omegaF] = calcCatapultInteractions(
+    #         np.pi, .3302, .0127, .0191, .056, .197,
+    #         (xDist + (rt * np.cos(angle)),
+    #          height + (rt * np.sin(angle))), 0.16764, .1778, 3 * np.pi / 4)
 
-print thetaF
-print omegaF
-r = .35
-vf = abs(omegaF * r)
+    #     r = .35
+    #     vf = abs(omegaF * r)
 
-posI = [r * np.cos(thetaF), r * np.sin(thetaF)]
-vI = [vf * np.cos(thetaF), vf * np.sin(thetaF)]
-print posI
-print vI
+    #     posI = [r * np.cos(thetaF), r * np.sin(thetaF)]
+    #     vI = [vf * np.sin(thetaF), -vf * np.cos(thetaF)]
 
-calcProjectileMotion(posI, vI)
+    #     trajectory = calcProjectileMotion(posI, vI)
+    #     xTraj = trajectory[0]
+    #     xF = xTraj[-1]
+    #     data = np.vstack([data, [angle, xF]])
+
+    # print data
+    # plt.plot(
+    #     data[:, 0], data[:, 1])
+
+    # plt.title(
+    #     "The Effect of Tension Arm Angle on the Total Range of Catapult", fontsize=20)
+    # plt.xlabel("Tension Arm Angle (Rad)", fontsize=18)
+    # plt.ylabel("Total X Distance (m)", fontsize=18)
+    # plt.yticks(fontsize=14)
+    # plt.xticks(fontsize=14)
+
+    # plt.legend(loc='upper right')
+    # plt.show()
